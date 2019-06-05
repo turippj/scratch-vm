@@ -2,6 +2,7 @@ const ArgumentType = require('../../extension-support/argument-type');
 const BlockType = require('../../extension-support/block-type');
 const Cast = require('../../util/cast');
 const log = require('../../util/log');
+const nets = require('nets');
 
 class Scratch3NewBlocks {
     constructor (runtime) {
@@ -14,11 +15,11 @@ class Scratch3NewBlocks {
             name: 'New Blocks',
             blocks: [
                 {
-                    opcode: 'writeLog',
+                    opcode: 'ajaxRequest',
                     blockType: BlockType.HAT,
-                    text: 'log [TEXT]',
+                    text: 'get [URL]',
                     arguments: {
-                        TEXT: {
+                        URL: {
                             type: ArgumentType.STRING,
                             defaultValue: "hello"
                         }
@@ -30,9 +31,17 @@ class Scratch3NewBlocks {
         };
     }
 
-    writeLog (args) {
-        const text = Cast.toString(args.TEXT);
-        log.log(text);
+    ajaxRequest (args){
+        const ajaxPromise = new Promise(resolve => {
+            nets({
+                url: Cast.toString(args.URL)
+            }, function(err, res, body){
+                resolve(body);
+               return body;
+            });
+        });
+        ajaxPromise.then(result => log.log(Cast.toString(result)));
+        return ajaxPromise;
     }
 }
 
