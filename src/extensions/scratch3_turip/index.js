@@ -11,30 +11,39 @@ class Scratch3NewBlocks {
 
     getInfo () {
         return {
-            id: 'newblocks',
-            name: 'New Blocks',
+            id: 'turip',
+            name: 'TURIP',
             blocks: [
                 {
-                    opcode: 'ajaxRequest',
-                    blockType: BlockType.HAT,
-                    text: 'get [URL]',
+                    opcode: 'LED',
+                    blockType: BlockType.COMMAND,
+                    text: 'LED [COLOR] を [BRIGHTNESS] にする',
                     arguments: {
-                        URL: {
+                        COLOR: {
                             type: ArgumentType.STRING,
-                            defaultValue: "hello"
+                            menu: 'colors',
+                        },
+
+                        BRIGHTNESS: {
+                            type: ArgumentType.NUMBER,
+                            defaultValue: 0
                         }
                     }
                 }
             ],
             menus: {
+                'colors': this.getColors()
             }
         };
     }
 
-    ajaxRequest (args){
+    LED (args){
         const ajaxPromise = new Promise(resolve => {
             nets({
-                url: Cast.toString(args.URL)
+                method: "PUT",
+                url: 'http://localhost:3000/1001/1',
+                body: `{"port": ${args.COLOR}, "data": ${args.BRIGHTNESS}}`,
+                headers: { "Content-Type": "application/json" }
             }, function(err, res, body){
                 resolve(body);
                return body;
@@ -42,6 +51,12 @@ class Scratch3NewBlocks {
         });
         ajaxPromise.then(result => log.log(Cast.toString(result)));
         return ajaxPromise;
+    }
+
+    getColors () {
+        return [
+            {text: "あか", value: 1}, {text: "みどり", value: 2},{text: "あお", value: 3}
+        ]
     }
 }
 
