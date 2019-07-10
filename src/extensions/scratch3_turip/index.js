@@ -96,7 +96,7 @@ class Scratch3NewBlocks {
                 {
                     opcode: 'DRV8835',
                     text: 'モーター [PORT] をつよさ [POWER] で回す',
-                    blockType: BlockType.REPORTER,
+                    blockType: BlockType.COMMAND,
                     arguments: {
                         PORT: {
                             type: ArgumentType.STRING,
@@ -112,7 +112,7 @@ class Scratch3NewBlocks {
                 {
                     opcode: 'DRV8835stop',
                     text: 'モーター [PORT] をとめる',
-                    blockType: BlockType.REPORTER,
+                    blockType: BlockType.COMMAND,
                     arguments: {
                         PORT: {
                             type: ArgumentType.STRING,
