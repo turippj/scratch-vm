@@ -9,10 +9,28 @@ let _brightness = [0,0];
 let _distance = 0;
 
 
+
 class Scratch3NewBlocks {
     constructor (runtime) {
         this.runtime = runtime;
     }
+
+    get COLOR_INFO() {
+        return {1: "あか", 2: "みどり", 3: "あお"};
+    }
+
+    get ENVIROMENT_INFO() {
+        return {1: "おんど", 2: "しつど", 3: "きあつ"};
+    }
+
+    get MOTOR_INFO() {
+        return {1: "1", 2: "2"};
+    }
+
+    get BRIGHTNESS_INFO() {
+        return {1: "あかるさ", 2: "ちかさ"};
+    }
+
 
     getInfo () {
         return {
@@ -27,6 +45,7 @@ class Scratch3NewBlocks {
                         COLOR: {
                             type: ArgumentType.STRING,
                             menu: 'colors',
+                            defaultValue: this.COLOR_INFO[1]
                         },
 
                         BRIGHTNESS: {
@@ -44,6 +63,7 @@ class Scratch3NewBlocks {
                         BRIGHTNESS: {
                             type: ArgumentType.STRING,
                             menu: 'brightnesses',
+                            defaultValue: this.BRIGHTNESS_INFO[1]
                         }
                     }
                 },
@@ -54,7 +74,8 @@ class Scratch3NewBlocks {
                     arguments: {
                         BRIGHTNESS: {
                             type: ArgumentType.STRING,
-                            menu: 'brightnesses'
+                            menu: 'brightnesses',
+                            defaultValue: this.BRIGHTNESS_INFO[1]
                         }
                     }
                 },
@@ -67,6 +88,7 @@ class Scratch3NewBlocks {
                         ENVIROMENT: {
                             type: ArgumentType.STRING,
                             menu: 'enviroments',
+                            defaultValue: this.ENVIROMENT_INFO[1]
                         }
                     }
                 },
@@ -77,7 +99,8 @@ class Scratch3NewBlocks {
                     arguments: {
                         ENVIROMENT: {
                             type: ArgumentType.STRING,
-                            menu: 'enviroments'
+                            menu: 'enviroments',
+                            defaultValue: this.ENVIROMENT_INFO[1]
                         }
                     }
                 },
@@ -101,6 +124,7 @@ class Scratch3NewBlocks {
                         PORT: {
                             type: ArgumentType.STRING,
                             menu: 'motors',
+                            defaultValue: this.MOTOR_INFO[1]
                         },
 
                         POWER: {
@@ -117,16 +141,17 @@ class Scratch3NewBlocks {
                         PORT: {
                             type: ArgumentType.STRING,
                             menu: 'motors',
+                            defaultValue: this.MOTOR_INFO[1]
                         }
                     }
                 },
             ],
 
             menus: {
-                'colors': [ {text: "あか", value: 1}, {text: "みどり", value: 2},{text: "あお", value: 3} ],
-                'enviroments': [ {text: "おんど", value: 1}, {text: "しつど", value: 2},{text: "きあつ", value: 3} ],
-                'motors': [ {text: "1", value: 1}, {text: "2", value: 2}],
-                'brightnesses': [ {text: "あかるさ", value: 1}, {text: "ちかさ", value: 2}]
+                'colors': this.getColorMenu(),
+                'enviroments': this.getEnviromentsMenu(),
+                'motors': this.getMotorMenu(),
+                'brightnesses': this.getBrightnessMenu()
             }
         };
     }
@@ -151,11 +176,12 @@ class Scratch3NewBlocks {
     }
 
     DRV8835 (args) {
+        const port = this.getPortNumber(this.MOTOR_INFO, args.PORT);
         const ajaxPromise = new Promise(resolve => {
             nets({
                 method: "PUT",
                 url: 'http://localhost:3000/12e48/1',
-                body: `{"port": ${args.PORT}, "data": ${args.POWER}}`,
+                body: `{"port": ${port}, "data": ${args.POWER}}`,
                 headers: { "Content-Type": "application/json" }
             }, function(err, res, body){
                 resolve(body);
@@ -167,11 +193,12 @@ class Scratch3NewBlocks {
     }
 
     DRV8835stop (args) {
+        const port = this.getPortNumber(this.MOTOR_INFO, args.PORT);
         const ajaxPromise = new Promise(resolve => {
             nets({
                 method: "PUT",
                 url: 'http://localhost:3000/12e48/1',
-                body: `{"port": ${args.PORT}, "data": 0}`,
+                body: `{"port": ${port}, "data": 0}`,
                 headers: { "Content-Type": "application/json" }
             }, function(err, res, body){
                 resolve(body);
@@ -184,49 +211,54 @@ class Scratch3NewBlocks {
 
 
     BME280 (args) {
+        const port = this.getPortNumber(this.ENVIROMENT_INFO, args.ENVIROMENT);
         const ajaxPromise = new Promise(resolve => {
             nets({
                 method: "GET",
-                url: `http://localhost:3000/12d10/1/${args.ENVIROMENT}`,
+                url: `http://localhost:3000/12d10/1/${port}`,
                 headers: { "Content-Type": "application/json" }
             }, function(err, res, body){
                 resolve(body);
                return body;
             });
         });
-        ajaxPromise.then(result => _enviroment[args.ENVIROMENT] = result );
+        ajaxPromise.then(result => _enviroment[port] = result );
         return ajaxPromise;
     }
 
     BME280value (args) {
-        return _enviroment[args.ENVIROMENT];
+        const port = this.getPortNumber(this.ENVIROMENT_INFO, args.ENVIROMENT);
+        return _enviroment[port];
     }
 
     APDS9960 (args) {
+        const port = this.getPortNumber(this.BRIGHTNESS_INFO, args.BRIGHTNESS);
         const ajaxPromise = new Promise(resolve => {
             nets({
                 method: "GET",
-                url: `http://localhost:3000/14e67/1/${args.BRIGHTNESS}`,
+                url: `http://localhost:3000/14e67/1/${port}`,
                 headers: { "Content-Type": "application/json" }
             }, function(err, res, body){
                 resolve(body);
                return body;
             });
         });
-        ajaxPromise.then(result => _brightness[args.BRIGHTNESS] = result );
+        ajaxPromise.then(result => _brightness[port] = result );
         return ajaxPromise;
     }
 
     APDS9960value (args) {
-        return _brightness[args.BRIGHTNESS];
+        const port = this.getPortNumber(this.BRIGHTNESS_INFO, args.BRIGHTNESS);
+        return _brightness[port];
     }
 
     LED (args){
+        const port = this.getPortNumber(this.COLOR_INFO, args.COLOR);
         const ajaxPromise = new Promise(resolve => {
             nets({
                 method: "PUT",
                 url: 'http://localhost:3000/1b09a/1',
-                body: `{"port": ${args.COLOR}, "data": ${args.BRIGHTNESS}}`,
+                body: `{"port": ${port}, "data": ${args.BRIGHTNESS}}`,
                 headers: { "Content-Type": "application/json" }
             }, function(err, res, body){
                 resolve(body);
@@ -235,6 +267,40 @@ class Scratch3NewBlocks {
         });
         ajaxPromise.then(result => log.log(Cast.toString(result)));
         return ajaxPromise;
+    }
+
+    getColorMenu () {
+        return Object.keys(this.COLOR_INFO).map(key => ({
+            text: this.COLOR_INFO[key],
+            value: key
+        }));
+    }
+
+    getEnviromentsMenu () {
+        return Object.keys(this.ENVIROMENT_INFO).map(key => ({
+            text: this.ENVIROMENT_INFO[key],
+            value: key
+        }));
+    }
+
+    getMotorMenu () {
+        return Object.keys(this.MOTOR_INFO).map(key => ({
+            text: this.MOTOR_INFO[key],
+            value: key
+        }));
+    }
+
+    getBrightnessMenu () {
+        return Object.keys(this.BRIGHTNESS_INFO).map(key => ({
+            text: this.BRIGHTNESS_INFO[key],
+            value: key
+        }));
+    }
+
+    getPortNumber(INFO, value) {
+        return Object.keys(INFO).filter( (key) => {
+            return INFO[key] === value
+        });
     }
 }
 
