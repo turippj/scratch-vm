@@ -67,17 +67,17 @@ class Scratch3NewBlocks {
                         }
                     }
                 },
+
                 {
-                    opcode: 'APDS9960value',
-                    text: '[BRIGHTNESS] をみる',
+                    opcode: 'APDS9960brightness',
+                    text: 'あかるさ',
                     blockType: BlockType.REPORTER,
-                    arguments: {
-                        BRIGHTNESS: {
-                            type: ArgumentType.STRING,
-                            menu: 'brightnesses',
-                            defaultValue: 1
-                        }
-                    }
+                },
+
+                {
+                    opcode: 'APDS9960distance',
+                    text: 'ちかさ',
+                    blockType: BlockType.REPORTER,
                 },
 
                 {
@@ -92,17 +92,23 @@ class Scratch3NewBlocks {
                         }
                     }
                 },
+
                 {
-                    opcode: 'BME280value',
-                    text: '[ENVIROMENT] をみる',
-                    blockType: BlockType.REPORTER,
-                    arguments: {
-                        ENVIROMENT: {
-                            type: ArgumentType.STRING,
-                            menu: 'enviroments',
-                            defaultValue: 1
-                        }
-                    }
+                    opcode: 'BME280temp',
+                    text: 'おんど',
+                    blockType: BlockType.REPORTER
+                },
+
+                {
+                    opcode: 'BME280humid',
+                    text: 'しつど',
+                    blockType: BlockType.REPORTER
+                },
+
+                {
+                    opcode: 'BME280press',
+                    text: 'きあつ',
+                    blockType: BlockType.REPORTER
                 },
 
                 {
@@ -112,7 +118,7 @@ class Scratch3NewBlocks {
                 },
                 {
                     opcode: 'VL53L1Xvalue',
-                    text: 'きょりをみる',
+                    text: 'きょり',
                     blockType: BlockType.REPORTER
                 },
 
@@ -167,7 +173,7 @@ class Scratch3NewBlocks {
                return body;
             });
         });
-        ajaxPromise.then(result => _distance = result );
+        ajaxPromise.then(result => _distance = Number(result) );
         return ajaxPromise;
     }
 
@@ -219,12 +225,20 @@ class Scratch3NewBlocks {
                return body;
             });
         });
-        ajaxPromise.then(result => _enviroment[args.ENVIROMENT] = result );
+        ajaxPromise.then(result => _enviroment[args.ENVIROMENT] = Number(result) );
         return ajaxPromise;
     }
 
-    BME280value (args) {
-        return _enviroment[args.ENVIROMENT];
+    BME280temp () {
+        return _enviroment[1];
+    }
+
+    BME280humid () {
+        return _enviroment[2];
+    }
+
+    BME280press () {
+        return _enviroment[3];
     }
 
     APDS9960 (args) {
@@ -238,12 +252,16 @@ class Scratch3NewBlocks {
                return body;
             });
         });
-        ajaxPromise.then(result => _brightness[args.BRIGHTNESS] = result );
+        ajaxPromise.then(result => _brightness[args.BRIGHTNESS] = Number(result) );
         return ajaxPromise;
     }
 
-    APDS9960value (args) {
-        return _brightness[args.BRIGHTNESS];
+    APDS9960brightness () {
+        return _brightness[1];
+    }
+
+    APDS9960distance () {
+        return _brightness[2];
     }
 
     LED (args){
