@@ -26,7 +26,10 @@ const builtinExtensions = {
     gdxfor: () => require('../extensions/scratch3_gdx_for'),
     tupotone: () => require('../extensions/scratch3_tupotone'),
     ml2scratch: () => require('../extensions/scratch3_ml2scratch'),
-    qrcode: () => require('../extensions/scratch3_qrcode')
+    qrcode: () => require('../extensions/scratch3_qrcode'),
+    httprest: () => require('../extensions/scratch3_httprest'),
+    jsonprocessing: () => require('../extensions/scratch3_jsonprocessing'),
+    textprocessing: () => require('../extensions/scratch3_textprocessing')
 };
 
 /**
